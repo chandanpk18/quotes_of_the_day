@@ -1,0 +1,171 @@
+/* General styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+header {
+    background-color: #004d40;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+    position: relative;
+}
+
+header .logo {
+    position: absolute;
+    left: 20px;
+    top: 20px;
+}
+
+header .header-title {
+    font-size: 24px;
+}
+
+header .user-profile {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    display: flex;
+    align-items: center;
+}
+
+header .user-profile img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+header .user-profile .logout-btn {
+    background-color: #ff6f61;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.container {
+    display: flex;
+    margin-top: 20px;
+}
+
+nav.sidebar {
+    width: 200px;
+    background-color: #004d40;
+    padding: 20px;
+    color: #fff;
+    height: calc(100vh - 80px);
+    position: fixed;
+    top: 80px;
+    left: 0;
+    overflow-y: auto;
+}
+
+nav.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+nav.sidebar ul li {
+    margin-bottom: 10px;
+}
+
+nav.sidebar ul li a {
+    color: #fff;
+    text-decoration: none;
+    display: block;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+nav.sidebar ul li a:hover {
+    background-color: #ff6f61;
+}
+
+main.main-content {
+    margin-left: 220px;
+    padding: 20px;
+    width: calc(100% - 220px);
+}
+
+section.welcome-message {
+    background-color: #004d40;
+    color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+}
+
+section.search-filter {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.search-bar {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.category-filter {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+section.issued-books,
+section.available-books {
+    margin-top: 20px;
+}
+
+section h2 {
+    border-bottom: 2px solid #004d40;
+    padding-bottom: 5px;
+}
+
+.issued-books ul,
+.available-books .book-list {
+    list-style: none;
+    padding: 0;
+}
+
+.issued-books ul li,
+.available-books .book-item {
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.issued-books ul li button,
+.available-books .book-item button {
+    background-color: #004d40;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.issued-books ul li button:hover,
+.available-books .book-item button:hover {
+    background-color: #ff6f61;
+}
+
+footer {
+    background-color: #004d40;
+    color: #fff;
+    text-align: center;
+    padding: 10px;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+}

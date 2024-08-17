@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .input-group-append .btn {
+            background-color: #007bff;
+            color: white;
+        }
+        .logout-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+        .editable {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row justify-content-between">
+            <h2>Admin Dashboard</h2>
+            <a href="{% url 'signout' %}" class="btn logout-btn">Sign Out</a>
+        </div>
+        <div class="row justify-content-between mt-3">
+            <div class="col-md-6">
+                <form class="form-inline position-relative">
+                    <div class="input-group">
+                        <input type="text" id="author_search" class="form-control" placeholder="Search by author" autocomplete="off" onkeyup="filterQuotes()">
+                        <div class="input-group-append">
+                            <button type="button" class="btn btn-outline-secondary">Search</button>
+                        </div>
+                    </div>
+                    <div id="suggestions" class="suggestions"></div>
+                </form>
+            </div>
+            <div class="col-md-6 text-right">
+                <form id="addQuoteForm" class="form-inline">
+                    <input type="text" id="quoteText" class="form-control mr-2" placeholder="Quote" required>
+                    <input type="text" id="quoteAuthor" class="form-control mr-2" placeholder="Author" required>
+                    <button type="submit" class="btn btn-primary">Add Quote</button>
+                </form>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <table class="table table-bordered" id="quoteTable">
+                <thead>
+                    <tr>
+                        <th>Quote</th>
+                        <th>Author</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for quote in quotes %}
+                    <tr id="quote-{{ quote.id }}">
+                        <td>
+                            <span class="quote-text">{{ quote.text }}</span>
+                            <input type="text" class="form-control editable quote-edit-text" value="{{ quote.text }}">
+                        </td>
+                        <td>
+                            <span class="quote-author">{{ quote.author }}</span>
+                            <input type="text" class="form-control editable quote-edit-author" value="{{ quote.author }}">
+                        </td>
+                        <td>
+                            <button class="btn btn-warning btn-edit">Edit</button>
+                            <button class="btn btn-danger btn-delete">Delete</button>
+                            <button class="btn btn-success btn-save editable">Save</button>
+                            <button class="btn btn-secondary btn-cancel editable">Cancel</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#addQuoteForm').on('submit', function(e) {
+                e.preventDefault();
+                var text = $('#quoteText').val();
+                var author = $('#quoteAuthor').val();
+                $.ajax({
+                    url: "{% url 'add' %}",
+                    method: 'POST',
+                    data: {
+                        'text': text,
+                        'author': author,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function(data) {
+                        $('#quoteTable tbody').append(`
+                            <tr id="quote-${data.id}">
+                                <td>
+                                    <span class="quote-text">${data.text}</span>
+                                    <input type="text" class="form-control editable quote-edit-text" value="${data.text}">
+                                </td>
+                                <td>
+                                    <span class="quote-author">${data.author}</span>
+                                    <input type="text" class="form-control editable quote-edit-author" value="${data.author}">
+                                </td>
+                                <td>
+                                    <button class="btn btn-warning btn-edit">Edit</button>
+                                    <button class="btn btn-danger btn-delete">Delete</button>
+                                    <button class="btn btn-success btn-save editable">Save</button>
+                                    <button class="btn btn-secondary btn-cancel editable">Cancel</button>
+                                </td>
+                            </tr>
+                        `);
+                        $('#quoteText').val('');
+                        $('#quoteAuthor').val('');
+                    }
+                });
+            });
+
+            $(document).on('click', '.btn-edit', function() {
+                var row = $(this).closest('tr');
+                row.find('.editable').show();
+                row.find('.quote-text, .quote-author, .btn-edit, .btn-delete').hide();
+            });
+
+            $(document).on('click', '.btn-cancel', function() {
+                var row = $(this).closest('tr');
+                row.find('.editable').hide();
+                row.find('.quote-text, .quote-author, .btn-edit, .btn-delete').show();
+            });
+
+            $(document).on('click', '.btn-save', function() {
+                var row = $(this).closest('tr');
+                var id = row.attr('id').split('-')[1];
+                var text = row.find('.quote-edit-text').val();
+                var author = row.find('.quote-edit-author').val();
+                $.ajax({
+                    url: `/admin/edit/${id}/`,
+                    method: 'POST',
+                    data: {
+                        'text': text,
+                        'author': author,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function(data) {
+                        row.find('.quote-text').text(data.text);
+                        row.find('.quote-author').text(data.author);
+                        row.find('.editable').hide();
+                        row.find('.quote-text, .quote-author, .btn-edit, .btn-delete').show();
+                    }
+                });
+            });
+
+            $(document).on('click', '.btn-delete', function() {
+                if (!confirm('Are you sure you want to delete this quote?')) {
+                    return;
+                }
+                var row = $(this).closest('tr');
+                var id = row.attr('id').split('-')[1];
+                $.ajax({
+                    url: `/admin/delete/${id}/`,
+                    method: 'POST',
+                    data: {
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function(data) {
+                        row.remove();
+                    }
+                });
+            });
+        });
+
+        function filterQuotes() {
+            var input, filter, table, tr, td, i, txtValue;
+            input = document.getElementById("author_search");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("quoteTable");
+            tr = table.getElementsByTagName("tr");
+
+            for (i = 1; i < tr.length; i++) { // Start at 1 to skip table header
+                td = tr[i].getElementsByTagName("td")[1]; // The author column
+                if (td) {
+                    txtValue = td.textContent || td.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

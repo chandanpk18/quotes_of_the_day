@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Quote of the Day</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Custom CSS -->
+    <style>
+        .quote-container {
+            margin-top: 50px;
+            text-align: center;
+        }
+        .input-group-append .btn {
+            background-color: #007bff;
+            color: white;
+        }
+        .logout-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 1rem;
+            background-color: transparent;
+        }
+        table th,
+        table td {
+            padding: 0.75rem;
+            vertical-align: top;
+            border-top: 1px solid #dee2e6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-between mt-3">
+            <div class="col-md-6">
+                <form class="form-inline">
+                    <div class="input-group">
+                        <input type="text" id="authorSearch" class="form-control" placeholder="Search by author" onkeyup="filterQuotes()">
+                        <div class="input-group-append">
+                            <button type="button" class="btn btn-outline-secondary">Search</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-2 text-right">
+                <a href="{% url 'signout' %}" class="btn logout-btn">Logout</a>
+            </div>
+        </div>
+        <div class="quote-container">
+            <h2>Quote of the Day</h2>
+            <div id="quoteCarousel" class="carousel slide" data-ride="carousel" data-interval="30000">
+                <div class="carousel-inner">
+                    {% for quote in all_quotes %}
+                    <div class="carousel-item {% if quote == quote_of_the_day %}active{% endif %}">
+                        <blockquote class="blockquote">
+                            <p>{{ quote.text }}</p>
+                            <footer class="blockquote-footer">{{ quote.author }}</footer>
+                        </blockquote>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <table id="quoteTable">
+                <tr>
+                    <th style="text-align:center;">Quotes</th>
+                    <th>Author</th>
+                </tr>
+                {% for i in all_quotes %}
+                <tr>
+                    <td>{{ i.text }}</td>
+                    <td>{{ i.author }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Custom JavaScript -->
+    <script>
+        function filterQuotes() {
+            var input, filter, table, tr, td, i, txtValue;
+            input = document.getElementById("authorSearch");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("quoteTable");
+            tr = table.getElementsByTagName("tr");
+
+            for (i = 1; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[1];
+                if (td) {
+                    txtValue = td.textContent || td.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>
